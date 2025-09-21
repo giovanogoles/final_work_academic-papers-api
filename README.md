@@ -85,6 +85,47 @@ The GraphQL endpoint is available at `/graphql`. You can use it to perform queri
 
 Contributions are welcome! Please open an issue or submit a pull request for any enhancements or bug fixes.
 
+## Project Structure
+
+```filetree
+academic-papers-api
+└── academic-papers-api
+|   ├── src
+|       ├── app.js
+|       ├── config
+|           └── config.js
+|       ├── controllers
+|           ├── auth.controller.js
+|           └── paper.controller.js
+|       ├── middlewares
+|           └── auth.middleware.js
+|       ├── models
+|           ├── paper.model.js
+|           └── user.model.js
+|       ├── routes
+|           ├── auth.routes.js
+|           └── paper.routes.js
+|       ├── services
+|           ├── auth.service.js
+|           └── paper.service.js
+|       ├── tests
+|           ├── controllers
+|               └── paper.controller.test.js
+|           ├── integration
+|               └── paper.test.js
+|           └── setup.js
+|       ├── graphql
+|           ├── resolvers
+|               └── paper.resolvers.js
+|           ├── schemas
+|               └── paper.schema.js
+|           └── index.js
+|       └── utils
+|           └── auth.js
+|   ├── package.json
+|   ├── README.md
+|   └── .env
+
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
