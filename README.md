@@ -30,8 +30,9 @@ This project is a RESTful API for managing academic paper submissions for a conf
 
 1. Clone the repository:
    ```
-   git clone <repository-url>
-   cd academic-papers-api
+   git clone https://github.com/giovanogoles/final_work_academic-papers-api.git
+   cd final_work_academic-papers-api/academic-papers-api
+
    ```
 
 2. Install dependencies:
@@ -41,7 +42,8 @@ This project is a RESTful API for managing academic paper submissions for a conf
 
 3. Create a `.env` file in the root directory and add your environment variables:
    ```
-   DATABASE_URL=<your-database-url>
+   PORT=3000
+   MONGO_URI=mongodb://localhost:27017/academic-papers
    JWT_SECRET=<your-jwt-secret>
    ```
 
@@ -60,8 +62,14 @@ To run the automated tests, use:
 ```
 npm test
 ```
-
 This will execute all unit and integration tests to ensure the API is functioning as expected.
+
+To generate test coverage
+```
+npm run coverage
+```
+coverage/lcov-report/index.html
+
 
 ## API Endpoints
 
@@ -85,6 +93,14 @@ The GraphQL endpoint is available at `/graphql`. You can use it to perform queri
 
 Contributions are welcome! Please open an issue or submit a pull request for any enhancements or bug fixes.
 
+## Continuous Integration (CI/CD)
+
+This project uses GitHub Actions to ensure code quality and reliability on every push and pull request.Pipeline Overview- Installs project dependencies with npm ci
+- Starts a MongoDB service for integration tests
+- Runs automated tests with Mocha, Chai, Sinon, and Supertest
+- Generates a coverage report with nyc (Istanbul)
+- Uploads the coverage report as an artifact in GitHub Actions
+
 ## Project Structure
 
 ```filetree
@@ -92,6 +108,7 @@ academic-papers-api
 └── academic-papers-api
 |   ├── src
 |       ├── app.js
+        ├── server.js
 |       ├── config
 |           └── config.js
 |       ├── controllers
