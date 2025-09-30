@@ -10,6 +10,17 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      mongo:
+        image: mongo:6
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -23,9 +34,13 @@ jobs:
         run: npm ci
 
       - name: Run tests
+        env:
+          MONGO_URI: mongodb://localhost:27017/testdb
         run: node ./node_modules/mocha/bin/mocha.js --require @babel/register "src/tests/{controllers,integration}/**/*.js"
 
       - name: Run coverage
+        env:
+          MONGO_URI: mongodb://localhost:27017/testdb
         run: npx nyc node ./node_modules/mocha/bin/mocha.js --require @babel/register "src/tests/{controllers,integration}/**/*.js"
 
       - name: Upload coverage report
