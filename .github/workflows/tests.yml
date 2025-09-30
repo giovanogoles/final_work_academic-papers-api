@@ -1,0 +1,50 @@
+name: Run Tests and Coverage
+
+on:
+  push:
+    branches: [ "ci-workflow" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mongo:
+        image: mongo:6
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        env:
+          MONGO_URI: mongodb://localhost:27017/testdb
+        run: node ./node_modules/mocha/bin/mocha.js --require @babel/register "src/tests/{controllers,integration}/**/*.js"
+
+      - name: Run coverage
+        env:
+          MONGO_URI: mongodb://localhost:27017/testdb
+        run: npx nyc node ./node_modules/mocha/bin/mocha.js --require @babel/register "src/tests/{controllers,integration}/**/*.js"
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage
