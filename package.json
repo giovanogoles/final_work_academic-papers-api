@@ -5,7 +5,7 @@
   "description": "API for managing academic paper submissions for a conference, requiring authentication for teachers, students, and evaluators.",
   "main": "src/app.js",
   "scripts": {
-    "test": "mocha --require @babel/register \"src/tests/{controllers,integration}/**/*.js\"",
+    "test": "node ./node_modules/mocha/bin/mocha.js --require @babel/register \"src/tests/{controllers,integration}/**/*.js\"",
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
     "coverage": "nyc npm test"
