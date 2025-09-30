@@ -23,10 +23,10 @@ jobs:
         run: npm ci
 
       - name: Run tests
-        run: npm test
+        run: node ./node_modules/mocha/bin/mocha.js --require @babel/register "src/tests/{controllers,integration}/**/*.js"
 
       - name: Run coverage
-        run: npm run coverage
+        run: npx nyc node ./node_modules/mocha/bin/mocha.js --require @babel/register "src/tests/{controllers,integration}/**/*.js"
 
       - name: Upload coverage report
         uses: actions/upload-artifact@v4
