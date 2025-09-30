@@ -63,6 +63,15 @@ npm test
 
 This will execute all unit and integration tests to ensure the API is functioning as expected.
 
+## Coverage Report
+- After each run, the coverage report is available in the Actions tab under Artifacts (coverage-report).
+- Locally, you can generate the report with:
+
+```
+npm run coverage
+```
+
+
 ## API Endpoints
 
 ### Authentication
@@ -85,6 +94,14 @@ The GraphQL endpoint is available at `/graphql`. You can use it to perform queri
 
 Contributions are welcome! Please open an issue or submit a pull request for any enhancements or bug fixes.
 
+## Continuous Integration (CI/CD)
+
+This project uses GitHub Actions to ensure code quality and reliability on every push and pull request.Pipeline Overview- Installs project dependencies with npm ci
+- Starts a MongoDB service for integration tests
+- Runs automated tests with Mocha, Chai, Sinon, and Supertest
+- Generates a coverage report with nyc (Istanbul)
+- Uploads the coverage report as an artifact in GitHub Actions
+
 ## Project Structure
 
 ```filetree
@@ -92,6 +109,7 @@ academic-papers-api
 └── academic-papers-api
 |   ├── src
 |       ├── app.js
+|       ├── server.js
 |       ├── config
 |           └── config.js
 |       ├── controllers
@@ -125,6 +143,8 @@ academic-papers-api
 |   ├── package.json
 |   ├── README.md
 |   └── .env
+|   ├── coverage
+
 
 ## License
 
