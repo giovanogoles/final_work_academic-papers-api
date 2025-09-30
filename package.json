@@ -7,7 +7,8 @@
   "scripts": {
     "test": "mocha --require @babel/register \"src/tests/{controllers,integration}/**/*.js\"",
     "start": "node src/app.js",
-    "dev": "nodemon src/app.js"
+    "dev": "nodemon src/app.js",
+    "coverage": "nyc npm test"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -25,8 +26,15 @@
     "mocha": "^11.7.2",
     "nodemon": "^2.0.7",
     "sinon": "^11.1.2",
-    "supertest": "^6.1.6"
+    "supertest": "^6.1.6",
+    "nyc": "^15.1.0"
   },
-  "author": "Your Name",
+  "nyc": {
+    "reporter": ["text", "lcov"],
+    "include": ["src/**/*.js"],
+    "exclude": ["src/tests/**"],
+    "all": true
+  },
+  "author": "Giovano Goles",
   "license": "MIT"
 }
