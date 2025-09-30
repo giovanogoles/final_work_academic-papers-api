@@ -7,8 +7,7 @@ const config = {
   db: {
     uri: process.env.DB_URI || 'mongodb://localhost:27017/academic-papers',
     options: {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+      
     },
   },
   jwt: {

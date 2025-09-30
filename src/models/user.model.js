@@ -1,25 +1,28 @@
-import mongoose from 'mongoose';
+import express from 'express';
+import {
+  createPaper,
+  getPapers,
+  getPaperById,
+  updatePaper,
+  deletePaper,
+} from '../controllers/paper.controller.js';
+import { authenticate, authorizeRoles } from '../middlewares/auth.middleware.js';
 
-const userSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true
-  },
-  password: {
-    type: String,
-    required: true
-  },
-  role: {
-    type: String,
-    enum: ['teacher', 'student', 'evaluator'],
-    required: true
-  }
-}, {
-  timestamps: true
-});
+const router = express.Router();
 
-const User = mongoose.model('User', userSchema);
+// Criar artigo (apenas usuários autenticados)
+router.post('/', authenticate, createPaper);
 
-export default User;
+// Listar todos os artigos
+router.get('/', getPapers);
+
+// Buscar artigo por ID
+router.get('/:id', getPaperById);
+
+// Atualizar artigo (apenas autenticado)
+router.put('/:id', authenticate, updatePaper);
+
+// Deletar artigo (apenas autenticado e com role "teacher" ou "evaluator")
+router.delete('/:id', authenticate, authorizeRoles('teacher', 'evaluator'), deletePaper);
+
+export default router;

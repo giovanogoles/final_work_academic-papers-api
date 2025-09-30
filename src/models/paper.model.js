@@ -5,28 +5,20 @@ const paperSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  abstract: {
+  content: {
     type: String,
     required: true,
   },
-  authors: {
-    type: [String],
+  author: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User', // referência ao autor
     required: true,
   },
-  keywords: {
-    type: [String],
-    required: true,
-  },
-  submittedAt: {
+  createdAt: {
     type: Date,
     default: Date.now,
   },
-  status: {
-    type: String,
-    enum: ['submitted', 'under_review', 'accepted', 'rejected'],
-    default: 'submitted',
-  },
-});
+}, { timestamps: true });
 
 const Paper = mongoose.model('Paper', paperSchema);
 

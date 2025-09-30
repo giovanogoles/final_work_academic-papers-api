@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { expect } from 'chai';
-import app from '../app'; // Adjust the import based on your app's structure
+import app from '../app.js'; // Adjust the import based on your app's structure
 
 before(async () => {
   // Connect to the test database

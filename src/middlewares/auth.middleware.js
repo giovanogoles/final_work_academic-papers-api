@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
-import { User } from '../models/user.model';
-import config from '../config/config';
+import User from '../models/user.model.js';
+import config from '../config/config.js';
 
 export const authenticate = async (req, res, next) => {
   const token = req.headers['authorization']?.split(' ')[1];
@@ -10,7 +10,7 @@ export const authenticate = async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, config.jwtSecret);
+    const decoded = jwt.verify(token, config.jwt.secret);
     req.user = await User.findById(decoded.id);
     
     if (!req.user) {

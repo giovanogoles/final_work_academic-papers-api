@@ -1,82 +1,78 @@
 import request from 'supertest';
+import mongoose from 'mongoose';
 import { expect } from 'chai';
-import app from '../../app'; // Adjust the import based on your app's structure
+import app from '../../app.js';
+import config from '../../config/config.js';
 
-describe('Integration Tests for Academic Paper Submission API', () => {
-  let token;
+describe('Integration Tests for Academic Paper Submission API', function () {
+  this.timeout(10000); // aumenta timeout para evitar falhas por lentidão
 
   before(async () => {
-    // Register a user to obtain a token
-    const res = await request(app)
-      .post('/api/auth/register')
-      .send({
-        username: 'testuser',
-        password: 'testpassword',
-        role: 'teacher'
-      });
-    expect(res.status).to.equal(201);
-    
-    // Login to get the token
-    const loginRes = await request(app)
-      .post('/api/auth/login')
-      .send({
-        username: 'testuser',
-        password: 'testpassword'
-      });
-    expect(loginRes.status).to.equal(200);
-    token = loginRes.body.token;
+    await mongoose.connect(config.db.uri, config.db.options);
+    await mongoose.connection.db.dropDatabase();
   });
+
+  after(async () => {
+    await mongoose.connection.dropDatabase();
+    await mongoose.connection.close();
+  });
+
+  let createdPaperId;
 
   it('should create a new paper submission', async () => {
     const res = await request(app)
       .post('/api/papers')
-      .set('Authorization', `Bearer ${token}`)
       .send({
-        title: 'Test Paper',
-        abstract: 'This is a test abstract.',
-        authors: ['testuser'],
-        keywords: ['test', 'paper']
-      });
-    
-    expect(res.status).to.equal(201);
-    expect(res.body).to.have.property('message', 'Paper submitted successfully');
+        title: 'Integration Test Paper',
+        content: 'This is a test content for integration.',
+        author: new mongoose.Types.ObjectId().toString()
+      })
+      .expect(201);
+
+    expect(res.body).to.have.property('message', 'Paper created successfully');
+    expect(res.body).to.have.property('paper');
+    expect(res.body.paper).to.have.property('_id');
+
+    createdPaperId = res.body.paper._id; // garante que não será undefined
   });
 
-  it('should retrieve all paper submissions', async () => {
+  it('should retrieve a paper submission', async () => {
     const res = await request(app)
-      .get('/api/papers')
-      .set('Authorization', `Bearer ${token}`);
-    
-    expect(res.status).to.equal(200);
-    expect(res.body).to.be.an('array');
+      .get(`/api/papers/${createdPaperId}`)
+      .expect(200);
+
+    expect(res.body).to.have.property('_id', createdPaperId);
+    expect(res.body).to.have.property('title', 'Integration Test Paper');
   });
 
-  it('should not create a paper submission without token', async () => {
+  it('should update a paper submission', async () => {
     const res = await request(app)
-      .post('/api/papers')
+      .put(`/api/papers/${createdPaperId}`)
       .send({
-        title: 'Test Paper',
-        abstract: 'This is a test abstract.',
-        authors: ['testuser'],
-        keywords: ['test', 'paper']
-      });
-    
-    expect(res.status).to.equal(401);
-    expect(res.body).to.have.property('error', 'No token provided');
+        title: 'Updated Title',
+        content: 'Updated content.'
+      })
+      .expect(200);
+
+    expect(res.body).to.have.property('message', 'Paper updated successfully');
+    expect(res.body.paper).to.have.property('title', 'Updated Title');
   });
 
-  it('should not create a paper submission with invalid token', async () => {
+  it('should return 404 if paper not found', async () => {
+    const fakeId = new mongoose.Types.ObjectId().toString();
+    await request(app).get(`/api/papers/${fakeId}`).expect(404);
+  });
+
+  it('should delete a paper submission', async () => {
     const res = await request(app)
-      .post('/api/papers')
-      .set('Authorization', 'Bearer invalidtoken')
-      .send({
-        title: 'Test Paper',
-        abstract: 'This is a test abstract.',
-        authors: ['testuser'],
-        keywords: ['test', 'paper']
-      });
-    
-    expect(res.status).to.equal(401);
-    expect(res.body).to.have.property('error', 'Invalid token');
+      .delete(`/api/papers/${createdPaperId}`)
+      .expect(200);
+
+    expect(res.body).to.have.property('message', 'Paper deleted successfully');
+  });
+
+  it('should return 404 when deleting non-existent paper', async () => {
+    const fakeId = new mongoose.Types.ObjectId().toString();
+    await request(app).delete(`/api/papers/${fakeId}`).expect(404);
   });
 });

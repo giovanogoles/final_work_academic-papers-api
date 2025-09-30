@@ -1,51 +1,68 @@
-import Paper from '../models/paper.model';
-import User from '../models/user.model';
+import paperService from '../services/paper.service.js';
 
-// Create a new paper submission
+// Criar novo paper
 export const createPaper = async (req, res) => {
   try {
-    const { title, abstract, authors, keywords } = req.body;
-    const paper = new Paper({ title, abstract, authors, keywords, submittedBy: req.user.id });
-    await paper.save();
-    res.status(201).json({ message: 'Paper submitted successfully', paper });
+    const paper = await paperService.createPaper(req.body);
+    return res.status(201).json({
+      message: 'Paper created successfully',
+      paper
+    });
   } catch (error) {
-    res.status(500).json({ error: 'An error occurred while submitting the paper' });
+    console.error('Error creating paper:', error);
+    return res.status(500).send('Internal Server Error');
   }
 };
 
-// Retrieve all paper submissions
-export const getAllPapers = async (req, res) => {
+// Listar todos os papers
+export const getPapers = async (req, res) => {
   try {
-    const papers = await Paper.find().populate('submittedBy', 'username');
-    res.status(200).json(papers);
+    const papers = await paperService.getAllPapers();
+    return res.status(200).json(papers);
   } catch (error) {
-    res.status(500).json({ error: 'An error occurred while retrieving papers' });
+    console.error('Error retrieving papers:', error);
+    return res.status(500).send('Internal Server Error');
   }
 };
 
-// Retrieve a specific paper submission by ID
+// Buscar paper por ID
 export const getPaperById = async (req, res) => {
   try {
-    const paper = await Paper.findById(req.params.id).populate('submittedBy', 'username');
+    const paper = await paperService.getPaperById(req.params.id);
     if (!paper) {
-      return res.status(404).json({ error: 'Paper not found' });
+      return res.status(404).send('Paper not found');
     }
-    res.status(200).json(paper);
+    return res.status(200).json(paper);
   } catch (error) {
-    res.status(500).json({ error: 'An error occurred while retrieving the paper' });
+    console.error('Error retrieving paper:', error);
+    return res.status(500).send('Internal Server Error');
   }
 };
 
-// Delete a paper submission
+// Atualizar paper por ID
+export const updatePaper = async (req, res) => {
+  try {
+    const paper = await paperService.updatePaper(req.params.id, req.body);
+    if (!paper) {
+      return res.status(404).send('Paper not found');
+    }
+    return res.status(200).json({ message: 'Paper updated successfully', paper });
+  } catch (error) {
+    console.error('Error updating paper:', error);
+    return res.status(500).send('Internal Server Error');
+  }
+};
+
+// Deletar paper por ID
 export const deletePaper = async (req, res) => {
   try {
-    const paper = await Paper.findById(req.params.id);
+    const paper = await paperService.deletePaper(req.params.id);
     if (!paper) {
-      return res.status(404).json({ error: 'Paper not found' });
+      return res.status(404).send('Paper not found');
     }
-    await paper.remove();
-    res.status(200).json({ message: 'Paper deleted successfully' });
+    return res.status(200).json({ message: 'Paper deleted successfully' });
   } catch (error) {
-    res.status(500).json({ error: 'An error occurred while deleting the paper' });
+    console.error('Error deleting paper:', error);
+    return res.status(500).send('Internal Server Error');
   }
 };

@@ -1,9 +1,10 @@
-import User from '../models/user.model';
-import bcrypt from 'bcrypt';
+import User from '../models/user.model.js';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
+import config from '../config/config.js';
 
-const register = async (req, res) => {
+export const register = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -17,11 +18,14 @@ const register = async (req, res) => {
     await newUser.save();
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({ error: 'Username already exists' });
+    }
     res.status(500).json({ error: 'Server error' });
   }
 };
 
-const login = async (req, res) => {
+export const login = async (req, res) => {
   const { username, password } = req.body;
 
   try {
@@ -35,14 +39,14 @@ const login = async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign(
+      { id: user._id, role: user.role },
+      config.jwt.secret,
+      { expiresIn: config.jwt.expiresIn }
+    );
+
     res.status(200).json({ token });
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
   }
-};
-
-export default {
-  register,
-  login,
 };

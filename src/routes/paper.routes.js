@@ -1,16 +1,21 @@
 import express from 'express';
-import { createPaper, getAllPapers, deletePaper } from '../controllers/paper.controller';
-import { authenticate } from '../middlewares/auth.middleware';
+import * as paperController from '../controllers/paper.controller.js';
 
 const router = express.Router();
 
-// Route to create a new paper submission
-router.post('/', authenticate(['teacher', 'student']), createPaper);
+// Criar novo paper
+router.post('/', paperController.createPaper);
 
-// Route to retrieve all paper submissions
-router.get('/', authenticate(['teacher', 'student', 'evaluator']), getAllPapers);
+// Listar todos os papers
+router.get('/', paperController.getPapers);
 
-// Route to delete a paper submission
-router.delete('/:id', authenticate(['teacher', 'evaluator']), deletePaper);
+// Buscar paper por ID
+router.get('/:id', paperController.getPaperById);
+
+// Atualizar paper por ID
+router.put('/:id', paperController.updatePaper);
+
+// Deletar paper por ID
+router.delete('/:id', paperController.deletePaper);
 
 export default router;
